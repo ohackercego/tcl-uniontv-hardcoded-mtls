@@ -1,0 +1,65 @@
+Client-certificate configuration as shipped in the firmware image
+(platform R41KT01, package R609).
+
+The `<password>` value is the fixed credential referenced in the advisory.
+The private-key material itself is NOT included in this repository; it is
+obtainable from the public firmware image at the paths below.
+
+Files referenced:
+  /vendor/etc/tbrowser2/config/crt/client/www.tcl.com.cert_bag.pem
+  /vendor/etc/tbrowser2/config/crt/client/www.tcl.com.key.pem
+  /vendor/etc/tbrowser2/config/crt/client/privkey.pem
+
+--------------------------------------------------------------
+
+<?xml version="1.0" encoding="UTF-8"?>
+<client_cert_config>
+	<element>
+		<host>securegate.iplayer.bbc.co.uk</host>
+		<port>443</port>
+		<type>PEM</type>
+		<certificate>/system/tbrowser2/crt/client/www.tcl.com.cert_bag.pem</certificate>
+		<key>/system/tbrowser2/crt/client/www.tcl.com.key.pem</key>
+		<password>REDACTED</password>
+	</element>
+	<element>
+		<host>ipsecure.stage.bbc.co.uk</host>
+		<port>443</port>
+		<type>PEM</type>
+		<certificate>/system/tbrowser2/crt/client/www.tcl.com.cert_bag.pem</certificate>
+		<key>/system/tbrowser2/crt/client/www.tcl.com.key.pem</key>
+		<password>REDACTED</password>
+	</element>
+	<element>
+		<host>ipsecure.test.bbc.co.uk</host>
+		<port>443</port>
+		<type>PEM</type>
+		<certificate>/system/tbrowser2/crt/client/www.tcl.com.cert_bag.pem</certificate>
+		<key>/system/tbrowser2/crt/client/www.tcl.com.key.pem</key>
+		<password>REDACTED</password>
+	</element>
+	<element>
+		<host>ipsecure.int.bbc.co.uk</host>
+		<port>443</port>
+		<type>PEM</type>
+		<certificate>/system/tbrowser2/crt/client/www.tcl.com.cert_bag.pem</certificate>
+		<key>/system/tbrowser2/crt/client/www.tcl.com.key.pem</key>
+		<password>REDACTED</password>
+	</element>
+	<element>
+		<host>b.digitaltv-labs-ssl-test.co.uk</host>
+		<port>443</port>
+		<type>PEM</type>
+		<certificate>/system/tbrowser2/crt/client/www.tcl.com.cert_bag.pem</certificate>
+		<key>/system/tbrowser2/crt/client/www.tcl.com.key.pem</key>
+		<password>REDACTED</password>
+	</element>
+	<element>
+		<host>fvp-auth.testing.digitaluk.co.uk</host>
+		<port>443</port>
+		<type>PEM</type>
+		<certificate>/system/tbrowser2/crt/client/www.tcl.com.cert_bag.pem</certificate>
+		<key>/system/tbrowser2/crt/client/www.tcl.com.key.pem</key>
+		<password>REDACTED</password>
+	</element>
+</client_cert_config>

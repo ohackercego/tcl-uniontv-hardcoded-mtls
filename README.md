@@ -99,6 +99,40 @@ Key/certificate pair verified (identical RSA modulus); private key is **not** en
 
 **End users:** keep the TV on a trusted LAN only; disable UPnP on the router; segment IoT/TV devices; do not expose the device to the internet; treat the TV as untrusted on the network.
 
+## Proof of Concept
+
+[`poc/poc_extract_mtls_creds.py`](poc/poc_extract_mtls_creds.py) locates the
+credential files inside a firmware image (or an extracted `vendor/` tree),
+extracts the certificate and private key, and proves that the key **pairs with
+the certificate** and is **not encrypted**.
+
+```sh
+# straight from an OTA image
+python3 poc/poc_extract_mtls_creds.py --image UpdateR609.img
+
+# or from an extracted vendor partition
+python3 poc/poc_extract_mtls_creds.py --vendor ./vendor_x
+```
+
+Expected output includes:
+
+```
+[+] hard-coded password entry present in config : True
+[+] authentication targets (7):
+      securegate.iplayer.bbc.co.uk  <-- PRODUCTION
+      ...
+[+] private key encrypted                      : False  (False = plaintext)
+[+] KEY PAIRS WITH CERTIFICATE                 : True
+ RESULT: VULNERABLE — shared plaintext mTLS client credential shipped in firmware.
+```
+
+The PoC ships **no key material**; it operates on a firmware image you provide.
+
+## Vendor notification
+
+- **2026-11-03** — reported to the vendor (TCL) through its security contact.
+- Status at time of publication: **no response received**.
+
 ## Disclosure
 
 Reported to the vendor and coordinated through a CNA. This repository is the public advisory required for submission.

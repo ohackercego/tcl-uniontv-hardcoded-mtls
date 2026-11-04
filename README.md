@@ -101,32 +101,54 @@ Key/certificate pair verified (identical RSA modulus); private key is **not** en
 
 ## Proof of Concept
 
-[`poc/poc_extract_mtls_creds.py`](poc/poc_extract_mtls_creds.py) locates the
-credential files inside a firmware image (or an extracted `vendor/` tree),
-extracts the certificate and private key, and proves that the key **pairs with
-the certificate** and is **not encrypted**.
+[`poc/poc_mtls_credential.py`](poc/poc_mtls_credential.py) runs five chained proofs
+against a firmware image you supply (or an extracted `vendor/` tree):
+
+| # | Proof |
+|---|---|
+| 1 | the firmware ships the credential block naming third-party gateways (incl. BBC iPlayer **production**) with a hard-coded password |
+| 2 | the shipped private key is **not encrypted** (plaintext) |
+| 3 | the key **matches** the certificate (identical RSA modulus) |
+| 4 | the key is cryptographically real: it **signs**, and the certificate's public key **verifies** (`Verified OK`) |
+| 5 | a live **mutual-TLS handshake**: a local TLS 1.3 server that requests a client certificate **receives the TCL client certificate** |
 
 ```sh
-# straight from an OTA image
-python3 poc/poc_extract_mtls_creds.py --image UpdateR609.img
-
-# or from an extracted vendor partition
-python3 poc/poc_extract_mtls_creds.py --vendor ./vendor_x
+python3 poc/poc_mtls_credential.py --image UpdateR609.img
+# or
+python3 poc/poc_mtls_credential.py --vendor ./vendor_x
 ```
 
-Expected output includes:
+Observed output (real run, firmware R609):
 
 ```
-[+] hard-coded password entry present in config : True
-[+] authentication targets (7):
-      securegate.iplayer.bbc.co.uk  <-- PRODUCTION
-      ...
-[+] private key encrypted                      : False  (False = plaintext)
-[+] KEY PAIRS WITH CERTIFICATE                 : True
- RESULT: VULNERABLE — shared plaintext mTLS client credential shipped in firmware.
+[PROOF 1] hard-coded credential block in the firmware
+          hard-coded password present : True
+          target : securegate.iplayer.bbc.co.uk   <== PRODUCTION
+          target : ipsecure.stage.bbc.co.uk
+          ...
+[PROOF 2] private key encryption
+          encrypted : False   (PLAINTEXT)
+[PROOF 3] key / certificate match
+          certificate modulus : B783E888C26588BA19F390A3931ED0FE6B171A88...
+          private key modulus : B783E888C26588BA19F390A3931ED0FE6B171A88...
+          MATCH : True
+[PROOF 4] the key is cryptographically real (sign -> verify)
+          result : Verified OK
+[PROOF 5] live mutual-TLS handshake with the extracted credential
+          TLS protocol : TLSv1.3
+          server received the TCL client certificate : True
+            server log> depth=0 C=FR, ST=France, L=Paris, O=TCL EUROPE, OU=TMT, CN=TCL CA Freeview
+
+ RESULT: VULNERABLE — the firmware ships a WORKING, shared,
+         plaintext mTLS client credential (key+cert+password).
 ```
 
-The PoC ships **no key material**; it operates on a firmware image you provide.
+Proofs 4 and 5 are the decisive evidence: the **extracted private key is a working
+client-authentication key for the extracted certificate**, and the TLS 1.3 handshake
+transmits it as the TCL client identity.
+
+The PoC ships **no key material**; it operates on a firmware image you provide and
+cleans up its temporary working directory.
 
 ## Vendor notification
 
